@@ -1,0 +1,8 @@
+# Ignore VS Code workspace settings
+.vscode/
+
+# Ignore all test result artifacts
+test_results/
+
+# Optional: macOS system files
+.DS_Store
