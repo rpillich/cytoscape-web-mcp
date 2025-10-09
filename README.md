@@ -5,11 +5,9 @@ Automated testing for Cytoscape Web using chrome-devtools MCP server.
 ## Quick Start
 
 ```bash
-# Ensure test directories exist
-mkdir -p test_results/{logs,screenshots,reports}
-
 # Run comprehensive test suite
 # Follow instructions in updated_automation_prompt.md
+# (Test directories created automatically)
 ```
 
 ## Test Suite Overview
