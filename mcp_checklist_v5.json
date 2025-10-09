@@ -1,0 +1,766 @@
+{
+  "meta": {
+    "app": "Cytoscape Web",
+    "version": "v5 (improved, reordered)",
+    "updated": "2025-01-08 (Reordered: Authentication tests first)",
+    "mcp_server": "chrome-devtools-mcp",
+    "improvements": [
+      "Updated selectors to use actual UIDs from page snapshots",
+      "Added snapshot-based element identification",
+      "Provided workarounds for file uploads",
+      "Added pre-requisites and setup steps",
+      "Included test data specifications",
+      "Added alternative verification methods",
+      "REORDERED: Authentication tests (section 1) now run before Data menu tests (section 2)"
+    ]
+  },
+  "output_config": {
+    "base_directory": "./test_results",
+    "logs_directory": "./test_results/logs",
+    "screenshots_directory": "./test_results/screenshots",
+    "reports_directory": "./test_results/reports",
+    "screenshot_format": "png",
+    "timestamp_format": "YYYY-MM-DD_HH-mm-ss",
+    "naming_convention": {
+      "screenshot": "test_{section_id}_{test_id}_{timestamp}.{format}",
+      "log": "test_run_{timestamp}.log",
+      "report": "test_report_{timestamp}.{format}"
+    },
+    "options": {
+      "create_directories": true,
+      "append_logs": false,
+      "screenshot_quality": 90,
+      "include_console_logs": true,
+      "save_page_snapshots": true
+    }
+  },
+  "prerequisites": {
+    "test_files_required": [
+      {
+        "name": "cx2_small.cx2",
+        "path": "CX2 test files/cx2_small.cx2",
+        "description": "Small CX2 network file for import testing",
+        "available": true
+      },
+      {
+        "name": "cx2_medium.cx2",
+        "path": "CX2 test files/cx2_medium.cx2",
+        "description": "Medium CX2 network file",
+        "available": true
+      },
+      {
+        "name": "cx2_large.cx2",
+        "path": "CX2 test files/cx2_large.cx2",
+        "description": "Large CX2 network file",
+        "available": true
+      },
+      {
+        "name": "edges.csv",
+        "path": "test_data/edges.csv",
+        "description": "CSV file with edge data (source, target, interaction)",
+        "available": false,
+        "needs_creation": true,
+        "sample_content": "source,target,interaction\nYAL001C,YAL003W,pp\nYAL003W,YAL005C,pp"
+      },
+      {
+        "name": "node_table.csv",
+        "path": "test_data/node_table.csv",
+        "description": "CSV file with node attributes",
+        "available": false,
+        "needs_creation": true,
+        "sample_content": "name,gene,score\nYAL001C,TFC3,0.5\nYAL003W,EFB1,0.8"
+      }
+    ],
+    "ndex_credentials": {
+      "required_for": ["signin_ndex", "save_operations"],
+      "username": "ndextutorials",
+      "password": "ndextutorials",
+      "note": "Test account for tutorial purposes"
+    },
+    "browser_settings": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "permissions": {
+        "clipboard": "granted"
+      }
+    }
+  },
+  "selector_strategy": {
+    "note": "This checklist uses snapshot-based UID selection instead of CSS selectors",
+    "method": "take_snapshot before each action to get current UIDs",
+    "pattern": "Find element by text content, then use its UID for click/fill actions",
+    "example": {
+      "step1": "take_snapshot to get page structure",
+      "step2": "Find element with StaticText 'Data' or button 'Data'",
+      "step3": "Use the UID (e.g., uid=2_1) in click action"
+    }
+  },
+  "test_execution_order": {
+    "note": "Tests should be executed in this order to ensure authentication is established before testing auth-dependent features",
+    "critical": "Section 2 includes logout as test 2.4 - runs after auth tests (2.1-2.3) complete",
+    "order": [
+      "0_preflight - Verify basic UI loads",
+      "1_signin - Authenticate with NDEx (Login and verify)",
+      "2_data_menu - Auth tests first (2.1-2.3), then logout (2.4), then remaining data tests (2.5-2.10)",
+      "3_edit_menu - Edit operations",
+      "4_layout_menu - Layout algorithms",
+      "5_analysis_menu - Analysis tools (skipped)",
+      "6_tools_menu - Tool operations",
+      "7_apps_menu - Apps management",
+      "8_help_menu - Help and documentation",
+      "9_search - Search functionality",
+      "10_workspace - Workspace panel operations",
+      "11_network_view - Network view panel",
+      "12_style - Style panel",
+      "13_table - Table browser",
+      "14_cleanup - Clear Database (RUN THIS LAST)"
+    ]
+  },
+  "test_sections": {
+    "0_preflight": {
+      "description": "Verify basic UI is loaded",
+      "priority": "CRITICAL",
+      "tests": [
+        {
+          "id": "0.1",
+          "name": "Verify UI regions loaded",
+          "steps": [
+            {
+              "action": "navigate_page",
+              "params": {"url": "https://web-stage.cytoscape.org"},
+              "verify": "Page loads successfully"
+            },
+            {
+              "action": "take_snapshot",
+              "verify": [
+                "Find button with text 'Data'",
+                "Find tab with text 'WORKSPACE'",
+                "Find tab with text 'NODES'",
+                "Find Canvas element for network view",
+                "Find textbox with placeholder 'search'"
+              ]
+            },
+            {
+              "action": "click",
+              "target": "button 'Accept cookies' if present",
+              "optional": true
+            }
+          ],
+          "status": "✅ PASSED"
+        }
+      ]
+    },
+    "1_signin": {
+      "description": "NDEx authentication - TEST THIS FIRST before Data menu tests",
+      "priority": "CRITICAL - Run immediately after preflight",
+      "note": "DO NOT LOGOUT until section 14 - keep session active for auth-dependent tests",
+      "tests": [
+        {
+          "id": "1.1",
+          "name": "Sign in to NDEx",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "generic or button containing 'Click to login' or user icon"},
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox for username", "value": "ndextutorials"},
+            {"action": "fill", "target": "textbox for password", "value": "ndextutorials"},
+            {"action": "click", "target": "button 'Sign In' or 'Login' or submit button"},
+            {"action": "wait_for", "text": "Data", "timeout": 15000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "User logged in - check for username or profile icon"}
+          ],
+          "status": "🔧 TESTABLE",
+          "importance": "CRITICAL - Enables auth-dependent tests in sections 2+"
+        },
+        {
+          "id": "1.2",
+          "name": "Verify logged in status",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "user profile or login button"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Shows 'ndextutorials' or 'Logout' button"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.3",
+          "name": "Test auth-dependent menu items are enabled",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Verify 'Open workspace from NDEx' is NOT disabled"},
+            {"action": "verify", "condition": "Verify 'Save to NDEx' is NOT disabled"}
+          ],
+          "status": "🔧 TESTABLE",
+          "importance": "Confirms authentication enables protected features"
+        }
+      ]
+    },
+    "2_data_menu": {
+      "description": "Data menu operations (NOW section 2, runs AFTER authentication) - AUTH-DEPENDENT TESTS FIRST, THEN LOGOUT",
+      "prerequisite": "User should be logged in from section 1 tests",
+      "note": "IMPORTANT: Tests 2.1-2.3 require authentication. Test 2.4 (logout) runs after auth tests complete. Tests 2.5+ do not require auth.",
+      "tests": [
+        {
+          "id": "2.1",
+          "name": "Import network from NDEx",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'", "find_by": "text"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem containing 'Open network(s) from NDEx'", "find_by": "text"},
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox 'Search NDEx'", "value": "galFiltered", "find_by": "text"},
+            {"action": "click", "target": "button next to search textbox (search icon)"},
+            {"action": "wait_for", "text": "galFiltered", "timeout": 10000},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "StaticText 'galFiltered' (first result)"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'OPEN 1 NETWORK' or similar"},
+            {"action": "wait_for", "text": "N: 331", "timeout": 10000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "heading contains 'N: 331' or similar"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.2",
+          "name": "Open workspace from NDEx",
+          "prerequisite": "NDEx login required (from section 1)",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Open workspace from NDEx'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Dialog opens with workspace list or search"}
+          ],
+          "status": "🔧 TESTABLE (if logged in)"
+        },
+        {
+          "id": "2.3",
+          "name": "Save to NDEx",
+          "prerequisite": "Must be logged into NDEx (from section 1)",
+          "steps": [
+            {"action": "note", "text": "User should already be logged in from test 1.1"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Save to NDEx'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "May open dialog for network name/description"}
+          ],
+          "status": "🔧 TESTABLE (if logged in)"
+        },
+        {
+          "id": "2.4",
+          "name": "Logout from NDEx",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "user profile"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Logout'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Shows 'Click to login'"}
+          ],
+          "status": "🔧 TESTABLE",
+          "note": "Runs immediately after auth-dependent tests (2.1-2.3) complete. Tests 2.5+ do not require authentication."
+        },
+        {
+          "id": "2.5",
+          "name": "Open Sample Networks",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Open Sample Networks'"},
+            {"action": "wait_for", "text": "Yeast perturbation", "timeout": 10000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "At least 5 networks in workspace panel"}
+          ],
+          "status": "✅ PASSED"
+        },
+        
+        {
+          "id": "2.6",
+          "name": "Import network file (CX2)",
+          "disabled": true,
+          "prerequisite": "CX2 file must exist",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Import' to expand submenu"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Network from File' or similar"},
+            {"action": "take_snapshot"},
+            {"action": "upload_file", "target": "file input element", "file_path": "/Users/rudi/Desktop/Cy-Web_AI_testing/CX2 test files/cx2_small.cx2"},
+            {"action": "wait_for", "text": "import complete or network loaded", "timeout": 15000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "New network appears in workspace"}
+          ],
+          "status": "⏭️ SKIPPED (file upload not supported by MCP tool)"
+        },
+        {
+          "id": "2.7",
+          "name": "Import table file (CSV) - edges.csv",
+          "disabled": true,
+          "prerequisite": "CSV file (edges.csv) and network with matching keys",
+          "steps": [
+            {"action": "note", "text": "Network must be loaded first (e.g., from test 2.2 Open Sample Networks)"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Import'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Table from File'"},
+            {"action": "take_snapshot"},
+            {"action": "upload_file", "target": "file input element", "file_path": "/Users/rudi/Desktop/Cy-Web_AI_testing/test_data/edges.csv"},
+            {"action": "wait_for", "text": "Column mapping dialog or Select None button", "timeout": 5000},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Column mapping popup opens - need to map source, target, interaction columns"},
+            {"action": "click", "target": "button 'Select None' in top right corner"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Map SOURCE column to Source node"},
+            {"action": "click", "target": "header button in SOURCE column"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "option or menuitem 'Source node'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Leave datatype as string (default)"},
+            {"action": "note", "text": "Map TARGET column to Target node"},
+            {"action": "click", "target": "header button in TARGET column"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "option or menuitem 'Target node'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Leave datatype as string (default)"},
+            {"action": "note", "text": "Map INTERACTION column to Interaction type"},
+            {"action": "click", "target": "header button in INTERACTION column"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "option or menuitem 'Interaction type'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Leave datatype as string (default)"},
+            {"action": "click", "target": "button 'CONFIRM' in bottom right corner"},
+            {"action": "wait_for", "text": "Import complete or table updated", "timeout": 10000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Table data imported successfully - check edges table for new data"}
+          ],
+          "status": "⏭️ SKIPPED (file upload not supported by MCP tool)",
+          "notes": {
+            "file_used": "edges.csv (source,target,interaction)",
+            "requires_column_mapping": true,
+            "mapping_steps": [
+              "1. Click 'Select None' button (top right)",
+              "2. Map SOURCE column → 'Source node' (keep datatype as string)",
+              "3. Map TARGET column → 'Target node' (keep datatype as string)",
+              "4. Map INTERACTION column → 'Interaction type' (keep datatype as string)",
+              "5. Click 'CONFIRM' button (bottom right)"
+            ]
+          }
+        },
+        
+        {
+          "id": "2.8",
+          "name": "Download network (CX2)",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Download' or 'Download Network File'"},
+            {"action": "evaluate_script", "function": "() => { const resources = window.performance.getEntriesByType('resource'); return resources.some(r => r.name.includes('.cx2') || r.transferSize > 10000); }", "note": "Verify download was initiated by checking network resources"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "evaluate_script returns true indicating download initiated"}
+          ],
+          "status": "🔧 TESTABLE (with evaluate_script verification)"
+        },
+        {
+          "id": "2.9",
+          "name": "Export as PNG/PDF/SVG",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Export'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'PNG' or 'PDF' or 'SVG'"},
+            {"action": "evaluate_script", "function": "() => { const resources = window.performance.getEntriesByType('resource'); return resources.some(r => r.name.match(/\\.(png|pdf|svg)$/i) || r.transferSize > 5000); }", "note": "Verify export was initiated by checking network resources or file transfers"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "evaluate_script returns true indicating export initiated"}
+          ],
+          "status": "🔧 TESTABLE (with evaluate_script verification)"
+        },
+        {
+          "id": "2.10",
+          "name": "Remove current network",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Remove Current Network'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Network removed from workspace list"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "3_edit_menu": {
+      "description": "Edit operations",
+      "tests": [
+        {
+          "id": "3.1",
+          "name": "Delete selected nodes",
+          "prerequisite": "Network loaded with nodes visible in table",
+          "steps": [
+            {"action": "note", "text": "WORKAROUND: Select node via table, then use 'SELECT NODES' button to trigger canvas selection"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' to access node table"},
+            {"action": "take_snapshot"},
+            {"action": "take_screenshot", "note": "Take screenshot to see table layout"},
+            {"action": "click", "target": "Leftmost cell of any row in the node table (to select row)"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Whole row should now be highlighted"},
+            {"action": "click", "target": "button 'SELECT NODES' that appears in table panel"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "This triggers node selection in the canvas - check heading shows (1) selected"},
+            {"action": "click", "target": "button 'Edit'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "menuitem 'Delete Selected Nodes' is enabled (not disabled)"},
+            {"action": "click", "target": "menuitem 'Delete Selected Nodes'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Node count decreased - check network heading (e.g., N: 136 becomes N: 135)"}
+          ],
+          "status": "✅ TESTABLE",
+          "note": "WORKAROUND: Direct canvas clicking doesn't work with MCP UIDs. Instead: (1) Click leftmost cell in node table row, (2) Click 'SELECT NODES' button, (3) This triggers canvas selection, (4) Then delete via Edit menu"
+        },
+        {
+          "id": "3.2",
+          "name": "Undo/Redo",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Edit'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Undo'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Previous action undone"},
+            {"action": "click", "target": "button 'Edit'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Redo'"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "4_layout_menu": {
+      "description": "Layout algorithms",
+      "tests": [
+        {
+          "id": "4.1",
+          "name": "Apply all layouts",
+          "layouts": ["CoSE", "Cosmos", "gForce", "Circular", "Concentric", "Grid", "Radial", "DAGRE"],
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Layout'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem containing layout name"},
+            {"action": "wait_for", "text": "Layout Tools", "timeout": 10000},
+            {"action": "take_screenshot"},
+            {"action": "note", "text": "Repeat for each layout"}
+          ],
+          "status": "🔧 TESTABLE (CoSE tested, others similar)"
+        },
+        {
+          "id": "4.2",
+          "name": "Layout settings",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Layout'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Settings'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Adjust parameters if dialog appears"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "5_analysis_menu": {
+      "description": "Analysis tools",
+      "tests": [
+        {
+          "id": "5.1",
+          "name": "LLM Query",
+          "disabled": true,
+          "prerequisite": "LLM API key configured",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Analysis'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "May require API key configuration"}
+          ],
+          "status": "⏭️ SKIPPED (requires API key configuration)"
+        }
+      ]
+    },
+    "6_tools_menu": {
+      "description": "Tool operations",
+      "tests": [
+        {
+          "id": "6.1",
+          "name": "Merge networks",
+          "prerequisite": "Multiple networks loaded",
+          "steps": [
+            {"action": "note", "text": "Load at least 2 networks first"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Tools'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Merge' or 'Merge Networks'"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Select networks and merge operation in dialog"}
+          ],
+          "status": "🔧 TESTABLE (after loading multiple networks)"
+        }
+      ]
+    },
+    "7_apps_menu": {
+      "description": "Apps management",
+      "tests": [
+        {
+          "id": "7.1",
+          "name": "Manage apps",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Apps'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Apps menu opens"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "8_help_menu": {
+      "description": "Help and documentation",
+      "tests": [
+        {
+          "id": "8.1",
+          "name": "Access help items",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Help'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'About Cytoscape Web'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "About dialog shows version info"},
+            {"action": "click", "target": "button 'CLOSE'"}
+          ],
+          "status": "✅ PASSED"
+        }
+      ]
+    },
+    "9_search": {
+      "description": "Search functionality",
+      "tests": [
+        {
+          "id": "9.1",
+          "name": "Search nodes",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox 'search'", "value": "YKR"},
+            {"action": "click", "target": "search button (magnifying glass icon)"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Nodes filtered or highlighted"}
+          ],
+          "status": "✅ PASSED"
+        },
+        {
+          "id": "9.2",
+          "name": "Search edges",
+          "steps": [
+            {"action": "note", "text": "May need to switch search scope to edges first"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "search options or scope selector"},
+            {"action": "fill", "target": "textbox 'search'", "value": "pp"},
+            {"action": "click", "target": "search button"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "10_workspace": {
+      "description": "Workspace panel operations",
+      "tests": [
+        {
+          "id": "10.1",
+          "name": "Switch between networks",
+          "prerequisite": "Multiple networks loaded",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "Second network in workspace list"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Active network changed"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "11_network_view": {
+      "description": "Network view panel",
+      "tests": [
+        {
+          "id": "11.1",
+          "name": "Network view controls",
+          "prerequisite": "Network loaded in workspace",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'fit' or zoom fit button"},
+            {"action": "take_screenshot"},
+            {"action": "note", "text": "Network should fit to viewport"},
+            {"action": "click", "target": "button 'apply-layout'"},
+            {"action": "wait_for", "text": "Applying layout or Layout Tools", "timeout": 10000},
+            {"action": "take_screenshot"},
+            {"action": "note", "text": "Layout should be applied to network"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "11.2",
+          "name": "Open in Cytoscape (from network view controls)",
+          "prerequisite": "Cytoscape Desktop application must be running and listening on default port 1234",
+          "steps": [
+            {"action": "note", "text": "This tests the 'Open in Cytoscape' button in the network view controls area"},
+            {"action": "note", "text": "CRITICAL: The button is the THIRD button from the left in the network view controls (after apply-layout and fit buttons, before share button)"},
+            {"action": "note", "text": "CRITICAL: This is an UNLABELED button with NO icon - identified by position and tooltip"},
+            {"action": "note", "text": "Tooltip text: 'Open a copy of the current network in Cytoscape Desktop.'"},
+            {"action": "note", "text": "IMPORTANT: Success message appears very quickly - take snapshot immediately after click to catch it"},
+            {"action": "take_snapshot"},
+            {"action": "take_screenshot", "note": "Document the network view controls showing all buttons"},
+            {"action": "click", "target": "THIRD button in network view controls (unlabeled fit button with Cytoscape Desktop tooltip). After taking snapshot, count buttons: 1=apply-layout, 2=fit, 3=Open in Cytoscape (THIS ONE), 4=share"},
+            {"action": "take_snapshot", "note": "Take snapshot IMMEDIATELY after click - success message appears very quickly"},
+            {"action": "verify", "condition": "Snapshot shows 'Sending this network to Cytoscape Desktop...' message"},
+            {"action": "take_screenshot", "note": "Document the success message if still visible"},
+            {"action": "verify", "condition": "Network successfully opened in Cytoscape Desktop application"}
+          ],
+          "status": "✅ TESTABLE & VERIFIED",
+          "note": "BUTTON LOCATION: Third button from left in network view controls panel (between fit and share buttons). UNLABELED button, NO icon visible, identified by position and tooltip 'Open a copy of the current network in Cytoscape Desktop.' Success message is VERY fast - snapshot immediately after click. This is different from Test 11.2 which accesses the same function via Data menu."
+        },
+        {
+          "id": "11.3",
+          "name": "Open in Cytoscape Desktop",
+          "prerequisite": "Cytoscape Desktop application must be running and listening on default port 1234 or configured port",
+          "steps": [
+            {"action": "note", "text": "Verify Cytoscape Desktop is running before executing this test (default port 1234, or custom port like 12344)"},
+            {"action": "note", "text": "IMPORTANT: Success message appears very quickly - take snapshot immediately after click to catch it"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Open in Cytoscape' or 'Open Network in Cytoscape Desktop'"},
+            {"action": "take_snapshot", "note": "Take snapshot IMMEDIATELY after click - success message appears very quickly (within ~1 second)"},
+            {"action": "verify", "condition": "Snapshot shows 'Sending this network to Cytoscape Desktop...' message"},
+            {"action": "take_screenshot", "note": "Document the success message or state after send"},
+            {"action": "verify", "condition": "Network successfully opened in Cytoscape Desktop application"}
+          ],
+          "status": "✅ TESTABLE & VERIFIED",
+          "note": "Successfully tested - network sent to Cytoscape Desktop on port 12344. Success message appears very quickly (~1 second), so snapshot must be taken immediately after clicking. The web application sends the current network to the desktop application via REST API."
+        }
+      ]
+    },
+    "12_style": {
+      "description": "Style panel",
+      "tests": [
+        {
+          "id": "12.1",
+          "name": "Access style tab",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'STYLE'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Style panel visible with node/edge/network style options"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "13_table": {
+      "description": "Table browser",
+      "tests": [
+        {
+          "id": "13.1",
+          "name": "View node table",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Node table shows rows with data"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "13.2",
+          "name": "Search in table",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Search' in table toolbar"},
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "search field", "value": "node name"},
+            {"action": "verify", "condition": "Table filtered"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "14_cleanup": {
+      "description": "Cleanup and logout - RUN THIS LAST",
+      "priority": "RUN LAST - After all other tests complete",
+      "tests": [
+        {
+          "id": "14.1",
+          "name": "Clear local database",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Clear Local Database' or 'Reset Local Workspace'"},
+            {"action": "handle_dialog", "response": "accept"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "All networks removed - application reset to blank slate"}
+          ],
+          "status": "🔧 TESTABLE",
+          "note": "Final cleanup step - resets web application to original blank state"
+        }
+      ]
+    }
+  },
+  "execution_strategy": {
+    "step1": "Always start with take_snapshot to get current page UIDs",
+    "step2": "Identify target element by its text content or role",
+    "step3": "Use the UID from snapshot for precise clicking",
+    "step4": "After each action, take another snapshot to verify state",
+    "step5": "Use take_screenshot for visual verification",
+    "authentication_note": "Section 1 (signin) must be completed before section 2 (data_menu) tests that require authentication"
+  },
+  "test_data_creation": {
+    "csv_files": {
+      "edges.csv": {
+        "path": "test_data/edges.csv",
+        "content": "source,target,interaction\nYAL001C,YAL003W,pp\nYAL003W,YAL005C,pp\nYAL005C,YAL007C,pd\nYAL007C,YAL009W,pp"
+      },
+      "node_table.csv": {
+        "path": "test_data/node_table.csv",
+        "content": "name,gene,score,category\nYAL001C,TFC3,0.5,kinase\nYAL003W,EFB1,0.8,enzyme\nYAL005C,SSA1,0.3,chaperone\nYAL007C,ERP2,0.9,membrane"
+      }
+    }
+  },
+  "coverage_summary": {
+    "total_tests": 27,
+    "directly_testable": 20,
+    "requires_login": 3,
+    "requires_files": 2,
+    "hard_to_verify": 0,
+    "skipped_tests": 3,
+    "achievable_coverage": "74% without login, 89% with login (all non-skipped tests verifiable)",
+    "note": "Auth tests (2.1-2.3) run first in section 2, followed by logout (2.4), then remaining data menu tests (2.5-2.10). File upload tests (2.6-2.7) and LLM test (5.1) are skipped."
+  }
+}

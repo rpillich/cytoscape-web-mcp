@@ -1,0 +1,12 @@
+name,gene,score,category
+YAL001C,TFC3,0.5,kinase
+YAL003W,EFB1,0.8,enzyme
+YAL005C,SSA1,0.3,chaperone
+YAL007C,ERP2,0.9,membrane
+YAL009W,SPO7,0.4,transcription
+YAL012W,CYS3,0.7,metabolic
+YAL014C,SYN8,0.6,transport
+YAL016W,TPD3,0.5,phosphatase
+YAL019W,FUN30,0.8,chromatin
+YAL021C,CCR4,0.7,deadenylase
+YAL023C,PMT2,0.6,transferase
