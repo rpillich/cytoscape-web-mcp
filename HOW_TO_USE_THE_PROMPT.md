@@ -7,3 +7,8 @@
 Read the file "updated_automation_prompt.md" and execute all instructions exactly as specified.
 ```
 
+```
+
+Read the file "tree_cell_view_automation_prompt.md" and execute all instructions exactly as specified.
+```
+

@@ -1,0 +1,628 @@
+{
+  "meta": {
+    "app": "Cytoscape Web",
+    "version": "Tree View and Cell View Test Checklist v5.3",
+    "created": "2025-11-03",
+    "updated": "2025-11-07 - Marked SUB NETWORK VIEWER node/edge selection tests as MANUAL (8 tests require human interaction)",
+    "focus": "Cell Map Network Visualizations (Tree View and Cell View)",
+    "mcp_server": "chrome-devtools-mcp",
+    "description": "Test checklist with 39 total tests: 31 automated via MCP, 8 require manual execution",
+    "test_breakdown": {
+      "total_tests": 39,
+      "automated_tests": 31,
+      "manual_tests": 8,
+      "manual_test_ids": ["1.9", "1.10", "1.11", "1.12", "2.9", "2.10", "2.11", "2.12"]
+    }
+  },
+  "output_config": {
+    "base_directory": "./test_results",
+    "logs_directory": "./test_results/logs",
+    "screenshots_directory": "./test_results/screenshots",
+    "reports_directory": "./test_results/reports",
+    "screenshot_format": "png",
+    "timestamp_format": "YYYY-MM-DD_HH-mm-ss",
+    "naming_convention": {
+      "screenshot": "tree_cell_view_test_{section_id}_{test_id}_{timestamp}.{format}",
+      "log": "tree_cell_view_test_run_{timestamp}.log",
+      "report": "tree_cell_view_test_report_{timestamp}.{format}"
+    },
+    "screenshot_policy": {
+      "default": "Take screenshots ONLY on test failures to document errors",
+      "exceptions": [
+        "Initial setup verification (test 0.4)",
+        "First view of Tree View and Cell View (tests 1.1, 2.1)"
+      ],
+      "note": "Snapshots are always taken for element identification, but visual screenshots should be reserved for failures"
+    }
+  },
+  "prerequisites": {
+    "required_network": {
+      "name": "U2OS Multi-scale Integrated Cell Map",
+      "source": "NDEx (Data > Open Network(s) from NDEx...)",
+      "uuid": "c380c4be-ae09-11f0-a218-005056ae3c32",
+      "node_count": 276,
+      "edge_count": 298,
+      "description": "Cell map network that enables Tree View and Cell View visualizations",
+      "note": "Tree View and Cell View tabs only appear for cell map networks with hierarchical structure"
+    },
+    "browser_settings": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      }
+    }
+  },
+  "test_execution_order": {
+    "note": "Execute tests in this order to ensure proper setup and avoid state conflicts",
+    "order": [
+      "0_setup - Load required cell map network from NDEx",
+      "1_tree_view_complete - Complete Tree View testing (display, zoom, tables, node selection, sub-network viewer)",
+      "2_cell_view_complete - Complete Cell View testing (display, zoom, tables, node selection, sub-network viewer)",
+      "3_subnetwork_filters - Test SUB NETWORK VIEWER filter panel and controls",
+      "4_controls - Test share buttons in both views",
+      "5_cleanup - Clean up test environment"
+    ]
+  },
+  "test_sections": {
+    "0_setup": {
+      "description": "Setup: Load cell map network from NDEx to enable Tree View and Cell View",
+      "priority": "CRITICAL - Must run first",
+      "tests": [
+        {
+          "id": "0.1",
+          "name": "Navigate to Cytoscape Web",
+          "steps": [
+            {
+              "action": "navigate_page",
+              "params": {"url": "https://web-stage.cytoscape.org"},
+              "verify": "Page loads successfully"
+            }
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "0.2",
+          "name": "Open network from NDEx",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Open Network(s) from NDEx...'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "NDEx network search dialog opens"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "0.3",
+          "name": "Search for and load MuSIC network by UUID",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox for network search", "value": "c380c4be-ae09-11f0-a218-005056ae3c32"},
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Search for MuSIC network using UUID: c380c4be-ae09-11f0-a218-005056ae3c32"},
+            {"action": "click", "target": "search button or press Enter to search"},
+            {"action": "wait_for", "text": "U2OS Multi-scale Integrated Cell Map", "timeout": 10000},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "the MuSIC network from search results"},
+            {"action": "click", "target": "button to load/open the selected network"},
+            {"action": "wait_for", "text": "TREE VIEW", "timeout": 15000},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Network loaded - TREE VIEW and CELL VIEW tabs appear"}
+          ],
+          "status": "🔧 TESTABLE",
+          "importance": "CRITICAL - Tree/Cell View tabs only appear for cell map networks"
+        },
+        {
+          "id": "0.4",
+          "name": "Verify Tree View and Cell View tabs present",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "tab 'TREE VIEW' is visible"},
+            {"action": "verify", "condition": "tab 'CELL VIEW' is visible"},
+            {"action": "verify", "condition": "tab 'SUB NETWORK VIEWER' is visible"},
+            {"action": "take_screenshot", "note": "EXCEPTION: Initial state documentation"}
+          ],
+          "status": "🔧 TESTABLE",
+          "importance": "Confirms cell map network visualization tabs are available"
+        }
+      ]
+    },
+    "1_tree_view_complete": {
+      "description": "Tree View Complete Testing: Display, zoom, tables, node selection, and sub-network viewer",
+      "prerequisite": "Cell map network (MuSIC) must be loaded",
+      "tests": [
+        {
+          "id": "1.1",
+          "name": "Access Tree View and verify map displays",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'TREE VIEW'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Tree View tab is selected"},
+            {"action": "verify", "condition": "Canvas displays tree visualization with hierarchical structure"},
+            {"action": "take_screenshot", "note": "EXCEPTION: First view of Tree View"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.2",
+          "name": "Verify zoom controls work in Tree View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'fit'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Tree structure fits within visible area"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.3",
+          "name": "Verify NODES table shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 276 }; }", "note": "Verify NODES table shows all 276 nodes from U2OS network"},
+            {"action": "verify", "condition": "NODES table displays all 276 nodes from the network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.4",
+          "name": "Verify EDGES table shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 298 }; }", "note": "Verify EDGES table shows all 298 edges from U2OS network"},
+            {"action": "verify", "condition": "EDGES table displays all 298 edges from the network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.5",
+          "name": "Select Mitochondrion node using text search",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox 'search'", "value": "mitochondrion"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "search button (magnifying glass icon next to search box)"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Mitochondrion node is selected in tree canvas"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.6",
+          "name": "Verify NODES table shows only 1 row (Mitochondrion)",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 1 }; }", "note": "Verify NODES table shows only 1 row (Mitochondrion)"},
+            {"action": "verify", "condition": "NODES table displays ONLY the selected Mitochondrion node (1 row)"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.7",
+          "name": "Verify EDGES table still shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 298 }; }", "note": "Verify EDGES table still shows all 298 edges"},
+            {"action": "verify", "condition": "EDGES table still displays all 298 edges (node selection doesn't filter edges)"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.8",
+          "name": "Verify SUB NETWORK VIEWER displays interaction network",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'SUB NETWORK VIEWER'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "SUB NETWORK VIEWER shows 'Subsystem: Mitochondrion'"},
+            {"action": "verify", "condition": "Sub-network canvas displays Mitochondrion interaction network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "1.9",
+          "name": "Select first gene (ACADM) in sub-network viewer NODES table",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Focus SUB NETWORK VIEWER by clicking its fit button"},
+            {"action": "note", "text": "MANUAL TEST: Click NODES tab in bottom panel"},
+            {"action": "note", "text": "MANUAL TEST: Click first gene in represents column (expected: ACADM)"},
+            {"action": "note", "text": "MANUAL TEST: Click SELECT NODES button"},
+            {"action": "note", "text": "MANUAL TEST: Verify ACADM node is selected in sub-network canvas"}
+          ],
+          "status": "⚠️ MANUAL - Requires human tester interaction",
+          "note": "SUB NETWORK VIEWER table data not accessible via automated DOM queries"
+        },
+        {
+          "id": "1.10",
+          "name": "Verify NODES table syncs to show only the selected gene",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Verify NODES table shows only 1 row with selected gene"}
+          ],
+          "status": "⚠️ MANUAL - Verify table synchronization",
+          "note": "Depends on successful execution of test 1.9"
+        },
+        {
+          "id": "1.11",
+          "name": "Select first edge from EDGES table",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Click EDGES tab in bottom panel"},
+            {"action": "note", "text": "MANUAL TEST: Click first edge's Shared Name cell"},
+            {"action": "note", "text": "MANUAL TEST: Click SELECT EDGES button"},
+            {"action": "note", "text": "MANUAL TEST: Verify edge is selected in sub-network canvas"}
+          ],
+          "status": "⚠️ MANUAL - Requires human tester interaction",
+          "note": "SUB NETWORK VIEWER table data not accessible via automated DOM queries"
+        },
+        {
+          "id": "1.12",
+          "name": "Verify EDGES table shows only the selected edge",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Verify EDGES table shows only 1 row with selected edge"}
+          ],
+          "status": "⚠️ MANUAL - Verify table synchronization",
+          "note": "Depends on successful execution of test 1.11"
+        },
+        {
+          "id": "1.13",
+          "name": "Clear all selections in Tree View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const canvas = document.querySelector('canvas'); if (canvas) { const rect = canvas.getBoundingClientRect(); const safeX = rect.left + 20; const safeY = rect.top + 20; const bgEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: safeX, clientY: safeY }); canvas.dispatchEvent(bgEvent); return `Clicked canvas at top-left corner to clear (${safeX}, ${safeY})`; } return 'Canvas not found'; }", "note": "Click empty area of canvas to deselect nodes/edges"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "NODES table now displays all nodes"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "EDGES table displays all edges"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "2_cell_view_complete": {
+      "description": "Cell View Complete Testing: Display, zoom, tables, node selection, and sub-network viewer",
+      "prerequisite": "Cell map network (MuSIC) must be loaded, Tree View testing completed",
+      "tests": [
+        {
+          "id": "2.1",
+          "name": "Access Cell View and verify map displays",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'CELL VIEW'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Cell View tab is selected"},
+            {"action": "verify", "condition": "Canvas displays circle packing visualization"},
+            {"action": "take_screenshot", "note": "EXCEPTION: First view of Cell View"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.2",
+          "name": "Verify zoom controls work in Cell View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'fit'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "All major circles visible within viewport"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.3",
+          "name": "Verify NODES table shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 276 }; }", "note": "Verify NODES table shows all 276 nodes from U2OS network"},
+            {"action": "verify", "condition": "NODES table displays all 276 nodes from the network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.4",
+          "name": "Verify EDGES table shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 298 }; }", "note": "Verify EDGES table shows all 298 edges from U2OS network"},
+            {"action": "verify", "condition": "EDGES table displays all 298 edges from the network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.5",
+          "name": "Select Mitochondrion node using text search",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "fill", "target": "textbox 'search'", "value": "mitochondrion"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "search button (magnifying glass icon next to search box)"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Mitochondrion node is selected in cell view canvas"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.6",
+          "name": "Verify NODES table shows only 1 row (Mitochondrion)",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 1 }; }", "note": "Verify NODES table shows only 1 row (Mitochondrion)"},
+            {"action": "verify", "condition": "NODES table displays ONLY the selected Mitochondrion node (1 row)"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.7",
+          "name": "Verify EDGES table still shows all rows",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const rows = document.querySelectorAll('tbody tr'); return { rowCount: rows.length, expectedCount: 298 }; }", "note": "Verify EDGES table still shows all 298 edges"},
+            {"action": "verify", "condition": "EDGES table still displays all 298 edges (node selection doesn't filter edges)"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.8",
+          "name": "Verify SUB NETWORK VIEWER displays interaction network",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'SUB NETWORK VIEWER'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "SUB NETWORK VIEWER shows 'Subsystem: Mitochondrion'"},
+            {"action": "verify", "condition": "Sub-network canvas displays Mitochondrion interaction network"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "2.9",
+          "name": "Select first gene (ACADM) in sub-network viewer NODES table",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Focus SUB NETWORK VIEWER by clicking its fit button"},
+            {"action": "note", "text": "MANUAL TEST: Click NODES tab in bottom panel"},
+            {"action": "note", "text": "MANUAL TEST: Click first gene in represents column (expected: ACADM)"},
+            {"action": "note", "text": "MANUAL TEST: Click SELECT NODES button"},
+            {"action": "note", "text": "MANUAL TEST: Verify ACADM node is selected in sub-network canvas"}
+          ],
+          "status": "⚠️ MANUAL - Requires human tester interaction",
+          "note": "SUB NETWORK VIEWER table data not accessible via automated DOM queries"
+        },
+        {
+          "id": "2.10",
+          "name": "Verify NODES table syncs to show only the selected gene",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Verify NODES table shows only 1 row with selected gene"}
+          ],
+          "status": "⚠️ MANUAL - Verify table synchronization",
+          "note": "Depends on successful execution of test 2.9"
+        },
+        {
+          "id": "2.11",
+          "name": "Select first edge from EDGES table",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Click EDGES tab in bottom panel"},
+            {"action": "note", "text": "MANUAL TEST: Click first edge's Shared Name cell"},
+            {"action": "note", "text": "MANUAL TEST: Click SELECT EDGES button"},
+            {"action": "note", "text": "MANUAL TEST: Verify edge is selected in sub-network canvas"}
+          ],
+          "status": "⚠️ MANUAL - Requires human tester interaction",
+          "note": "SUB NETWORK VIEWER table data not accessible via automated DOM queries"
+        },
+        {
+          "id": "2.12",
+          "name": "Verify EDGES table shows only the selected edge",
+          "steps": [
+            {"action": "note", "text": "MANUAL TEST: Verify EDGES table shows only 1 row with selected edge"}
+          ],
+          "status": "⚠️ MANUAL - Verify table synchronization",
+          "note": "Depends on successful execution of test 2.11"
+        },
+        {
+          "id": "2.13",
+          "name": "Clear all selections in Cell View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const canvas = document.querySelector('canvas'); if (canvas) { const rect = canvas.getBoundingClientRect(); const safeX = rect.left + 20; const safeY = rect.top + 20; const bgEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: safeX, clientY: safeY }); canvas.dispatchEvent(bgEvent); return `Clicked canvas at top-left corner to clear (${safeX}, ${safeY})`; } return 'Canvas not found'; }", "note": "Click empty area of canvas to deselect nodes/edges"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'NODES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "NODES table now displays all nodes"},
+            {"action": "click", "target": "tab 'EDGES' in bottom panel"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "EDGES table displays all edges"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "3_subnetwork_filters": {
+      "description": "SUB NETWORK VIEWER Filters: Test filter panel and controls",
+      "prerequisite": "Mitochondrion subsystem loaded in SUB NETWORK VIEWER (from Section 2 test 2.8)",
+      "tests": [
+        {
+          "id": "3.1",
+          "name": "Verify filter panel is displayed",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'SUB NETWORK VIEWER'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Filter panel is visible below the sub-network canvas"},
+            {"action": "verify", "condition": "Filter controls are displayed"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "3.2",
+          "name": "Verify filter toggles work properly",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Filter toggle switches are functional"},
+            {"action": "note", "text": "Identify available filter toggle controls"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "3.3",
+          "name": "Verify gear icon displays filter settings",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "gear icon (settings) in filter panel"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Filter settings dialog or panel appears"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "3.4",
+          "name": "Verify unchecking 'integrated interactions' hides all edges",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "note", "text": "Find checkbox labeled 'integrated interactions'"},
+            {"action": "click", "target": "checkbox 'integrated interactions' to uncheck it"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const edges = document.querySelectorAll('line, path[d*=\"M\"]'); const visibleEdges = Array.from(edges).filter(e => e.style.display !== 'none' && e.style.visibility !== 'hidden'); return { totalEdges: edges.length, visibleEdges: visibleEdges.length }; }", "note": "Verify all edges are hidden in sub-network viewer"},
+            {"action": "verify", "condition": "All edges disappear from sub-network canvas"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE",
+          "importance": "CRITICAL - Verifies integrated interactions filter controls edge visibility"
+        },
+        {
+          "id": "3.5",
+          "name": "Re-enable integrated interactions and verify edges reappear",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "checkbox 'integrated interactions' to check it"},
+            {"action": "take_snapshot"},
+            {"action": "evaluate_script", "function": "() => { const edges = document.querySelectorAll('line, path[d*=\"M\"]'); const visibleEdges = Array.from(edges).filter(e => e.style.display !== 'none' && e.style.visibility !== 'hidden'); return { totalEdges: edges.length, visibleEdges: visibleEdges.length }; }", "note": "Verify edges are visible again in sub-network viewer"},
+            {"action": "verify", "condition": "Edges reappear in sub-network canvas"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "4_controls": {
+      "description": "View Controls: Test share buttons in both views",
+      "tests": [
+        {
+          "id": "4.1",
+          "name": "Test share button in Tree View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'TREE VIEW'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'share'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Share dialog or options appear"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "4.2",
+          "name": "Test share button in Cell View",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "tab 'CELL VIEW'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'share'"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "Share dialog or options appear"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        }
+      ]
+    },
+    "5_cleanup": {
+      "description": "Cleanup: Reset workspace after testing",
+      "priority": "RUN LAST",
+      "tests": [
+        {
+          "id": "5.1",
+          "name": "Remove test network from workspace",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Remove the network from workspace' for MuSIC network"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "MuSIC network removed - Tree/Cell View tabs disappear"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE"
+        },
+        {
+          "id": "5.2",
+          "name": "Clear all networks (optional full cleanup)",
+          "steps": [
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "button 'Data'"},
+            {"action": "take_snapshot"},
+            {"action": "click", "target": "menuitem 'Clear Local Database'"},
+            {"action": "handle_dialog", "response": "accept"},
+            {"action": "take_snapshot"},
+            {"action": "verify", "condition": "All networks cleared from workspace"},
+            {"action": "take_screenshot", "condition": "only_on_failure"}
+          ],
+          "status": "🔧 TESTABLE",
+          "note": "Complete workspace reset"
+        }
+      ]
+    }
+  },
+  "execution_strategy": {
+    "step1": "Always start with take_snapshot to get current page UIDs",
+    "step2": "Identify target element by its text content or role",
+    "step3": "Use the UID from snapshot for precise clicking",
+    "step4": "After each action, take another snapshot to verify state",
+    "step5": "Use take_screenshot ONLY on test failures or explicitly noted exceptions",
+    "note": "Tree View and Cell View are only available for cell map networks with hierarchical structure"
+  },
+  "important_notes": {
+    "network_requirement": "Tree View and Cell View tabs ONLY appear when a cell map network (like MuSIC) is loaded from NDEx",
+    "visualization_types": {
+      "tree_view": "Hierarchical tree structure showing parent-child relationships",
+      "cell_view": "Circle packing layout with nested circles representing cellular compartments"
+    },
+    "integration": "Both views integrate with SUB NETWORK VIEWER for detailed subsystem exploration",
+    "controls": "Standard controls (fit, share) available in both view modes",
+    "table_behavior": "Node selection filters NODES table to show only selected node, but EDGES table shows all edges",
+    "selection_persistence": "Selecting a node loads its sub-network in SUB NETWORK VIEWER"
+  }
+}
