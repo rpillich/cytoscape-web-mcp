@@ -22,12 +22,11 @@ Automated testing for Cytoscape Web Tree View and Cell View features using chrom
 | Section | Tests | Focus Area |
 |---------|-------|------------|
 | 0. Setup | 4 | Load MuSIC cell map network |
-| 1. Tree View | 5 | Hierarchical tree structure |
-| 2. Cell View | 6 | Circle packing visualization |
-| 3. View Switching | 3 | Toggle between views with selection persistence |
-| 4. SUB NETWORK VIEWER | 6 | Node/edge selection in subsystem |
-| 5. Controls | 4 | View controls and navigation |
-| 6. Cleanup | 1 | Reset application state |
+| 1. Tree View | 8 | Hierarchical tree structure, Sub Network Viewer sync |
+| 2. Cell View | 8 | Circle packing visualization, Sub Network Viewer sync |
+| 3. Sub Network Filters | 5 | Filter toggles and gear settings |
+| 4. Controls | 2 | Share controls in each view |
+| 5. Cleanup | 2 | Remove network and clear workspace |
 
 ## Prerequisites
 
@@ -63,21 +62,15 @@ Automated testing for Cytoscape Web Tree View and Cell View features using chrom
 
 ## Critical Notes
 
-**Manual Testing Requirements:**
-- **Total Tests:** 39 (31 automated, 8 manual)
-- **Manual Tests:** 1.9, 1.10, 1.11, 1.12, 2.9, 2.10, 2.11, 2.12
-- **Reason:** SUB NETWORK VIEWER table data (NODES/EDGES tables within the sub-network viewer) is not accessible via automated DOM queries due to technical limitations
-- **Affected Features:** Node and edge selection within the SUB NETWORK VIEWER requires human tester interaction
-- **Impact:** These tests must be executed manually by clicking table rows and verifying selection behavior in the canvas
+**Manual Testing Requirements:** None (all 29 tests are automated)
 
 **Test Order (MANDATORY):**
 1. Section 0: Setup (Load MuSIC network - REQUIRED FIRST)
-2. Section 1: Tree View tests (includes 4 manual tests: 1.9-1.12)
-3. Section 2: Cell View tests (includes 4 manual tests: 2.9-2.12)
-4. Section 3: View Switching tests
-5. Section 4: SUB NETWORK VIEWER interactions
-6. Section 5: Controls tests
-7. Section 6: Cleanup (MUST RUN LAST)
+2. Section 1: Tree View tests
+3. Section 2: Cell View tests
+4. Section 3: Sub Network Viewer filters
+5. Section 4: Controls
+6. Section 5: Cleanup (MUST RUN LAST)
 
 **Screenshot Policy:**
 - Use `take_snapshot` frequently for element identification

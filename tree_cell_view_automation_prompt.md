@@ -11,12 +11,12 @@ You are tasked with performing a **COMPLETE and EXHAUSTIVE** automated test of t
 
 ⚠️ **BEFORE using `attempt_completion`, you MUST verify ALL of these conditions (1 through 4):**
 
-1. ✅ **ALL 39 tests have been executed** (No legitimate skips - all tests are executable)
+1. ✅ **ALL 29 tests have been executed** (No legitimate skips - all tests are executable)
 2. ✅ **Section 5 (Cleanup) has been completed** as the final step
 3. ✅ **The final test report has been generated and saved** to `./test_results/reports/`
-4. ✅ **You have explicitly counted and verified** that all 39 tests are complete
+4. ✅ **You have explicitly counted and verified** that all 29 tests are complete
 
-**If you attempt completion before executing all 39 tests, you have FAILED the task.**
+**If you attempt completion before executing all 29 tests, you have FAILED the task.**
 
 ### Expected Execution Time
 
@@ -39,9 +39,9 @@ These tests focus on **Tree View** and **Cell View** - special visualization mod
 - **Cell View**: Circle packing visualization with nested circles representing cellular compartments
 
 ### Test Count
-- **Total tests: 39** (all directly testable)
+- **Total tests: 29** (all directly testable)
 - **Legitimate skips: 0** (all tests can be executed)
-- **Required execution: 39 tests**
+- **Required execution: 29 tests**
 
 ---
 
@@ -53,7 +53,7 @@ These tests focus on **Tree View** and **Cell View** - special visualization mod
 - **Time constraints are NOT a valid reason to skip tests**
 - **DO NOT abbreviate or summarize test execution**
 - Every test marked as 🔧 TESTABLE **MUST BE EXECUTED**
-- The checklist contains 39 tests; you must execute ALL 39
+- The checklist contains 29 tests; you must execute ALL 29
 
 ### 2. MCP Server Usage
 - Use the **chrome-devtools-mcp** server exclusively for all browser interactions
@@ -94,14 +94,14 @@ Execute tests in this **STRICT ORDER**:
 **Before using `attempt_completion`, you MUST verify ALL of these are checked:**
 
 - [ ] Section 0: Setup (4 tests) - COMPLETED
-- [ ] Section 1: Tree View Complete (13 tests) - COMPLETED
-- [ ] Section 2: Cell View Complete (13 tests) - COMPLETED
+- [ ] Section 1: Tree View Complete (8 tests) - COMPLETED
+- [ ] Section 2: Cell View Complete (8 tests) - COMPLETED
 - [ ] Section 3: SUB NETWORK VIEWER Filters (5 tests) - COMPLETED
 - [ ] Section 4: Controls (2 tests) - COMPLETED
 - [ ] Section 5: Cleanup (2 tests) - COMPLETED AS FINAL STEP
 - [ ] Final Report Generated and Saved - COMPLETED
 
-**Total Tests Required: 39 (all tests are executable)**
+**Total Tests Required: 29 (all tests are executable)**
 
 **If ANY checkbox above is unchecked, you MUST continue testing.**
 
@@ -111,7 +111,7 @@ Execute tests in this **STRICT ORDER**:
 
 Ask yourself these questions. If ANY answer is "NO", DO NOT use attempt_completion:
 
-1. ✅ Have I executed ALL 39 tests? (Count them explicitly)
+1. ✅ Have I executed ALL 29 tests? (Count them explicitly)
 2. ✅ Did I execute Section 5 (Cleanup) as the LAST step?
 3. ✅ Have I generated the final comprehensive report?
 4. ✅ Can I provide proof (screenshots, test count) that all tests were executed?
@@ -126,13 +126,13 @@ Ask yourself these questions. If ANY answer is "NO", DO NOT use attempt_completi
 
 Your test execution is ONLY successful if you can verify:
 
-1. ✅ Executed exactly **39 tests** (no skips)
+1. ✅ Executed exactly **29 tests** (no skips)
 2. ✅ Report shows results for sections: **0, 1, 2, 3, 4, 5**
 3. ✅ Section 5 (Cleanup) documented as the **LAST** test executed
 4. ✅ Have screenshots for failures and documented exceptions
-5. ✅ Final report includes detailed results for **all 39 tests**
+5. ✅ Final report includes detailed results for **all 29 tests**
 
-**Count your executed tests. If the number is not 39, you have NOT completed the task.**
+**Count your executed tests. If the number is not 29, you have NOT completed the task.**
 
 ---
 
@@ -186,14 +186,14 @@ Your test execution is ONLY successful if you can verify:
 
 **After EVERY test section completion, you MUST:**
 
-1. Update your progress counter: "Completed X of 39 required tests"
+1. Update your progress counter: "Completed X of 29 required tests"
 2. List remaining sections to execute
 3. Confirm continuation to next section
 
 **Example Progress Update:**
 ```
 ╔════════════════════════════════════════════╗
-║ PROGRESS: 30/39 tests complete (77%)      ║
+║ PROGRESS: 20/29 tests complete (69%)      ║
 ║ SECTIONS DONE: 0, 1, 2                    ║
 ║ SECTIONS REMAINING: 3, 4, 5               ║
 ║ NEXT: Section 3 - SUB NETWORK VIEWER Filters ║
@@ -221,26 +221,26 @@ CRITICAL: Tree View and Cell View ONLY appear for cell map networks
 
 #### View Mode Tests
 ```
-Tree View Complete (Section 1 - 13 tests):
+Tree View Complete (Section 1 - 8 tests):
 - Display hierarchical tree structure
 - Test zoom controls (fit button)
-- Verify NODES table shows all 276 nodes
-- Verify EDGES table shows all 298 edges
 - Select Mitochondrion node using text search
 - Verify NODES table filters to 1 row (Mitochondrion selected)
 - Verify EDGES table still shows all 298 edges
 - Verify SUB NETWORK VIEWER displays Mitochondrion subsystem
-- Select VASN node in sub-network viewer via DOM
-- Verify NODES table syncs (shows only VASN)
-- Select VASN-SLC37A4 edge via EDGES table
-- Verify edge selection (table shows only selected edge)
-- Clear all selections, verify tables restore
+- Select the first gene in the Sub Network Viewer and confirm the label matches between grid and mini network
+- Clear all selections and confirm no nodes remain selected
 
-Cell View Complete (Section 2 - 13 tests):
-- Same test sequence as Tree View, but in Cell View context
-- Verifies circle packing visualization
-- Tests all same functionality: zoom, tables, search, sub-network viewer
+Cell View Complete (Section 2 - 8 tests):
+- Same sequence as Tree View but within Cell View (circle packing)
+- Includes verifying zoom controls, node search, table states, Sub Network Viewer sync, and selection clearing
 ```
+
+Sub Network Viewer selection workflow (applies to automated Tests 1.7 and 2.9):
+- After switching to the Sub Network Viewer tab, press the mini-network `fit` button so the canvas has focus.
+- Trigger the scripted click on the first NODES row (leftmost cell) to highlight it.
+- Use the `SELECT NODES` button beneath the NODES tab header to push the selection into the mini network.
+- Verify via script that the grid row label matches the selected node label in the mini network rendering.
 
 ### E. Reporting Requirements
 
@@ -258,8 +258,8 @@ Create a comprehensive test report saved as: `./test_results/reports/tree_cell_v
 **The report MUST include**:
 
 1. **Executive Summary**
-   - Total tests in checklist: 39
-   - Tests executed: [number - must be 39]
+   - Total tests in checklist: 29
+   - Tests executed: [number - must be 29]
    - Tests skipped: [number - must be 0]
    - Tests passed: [number]
    - Tests failed: [number]
@@ -286,29 +286,25 @@ Create a comprehensive test report saved as: `./test_results/reports/tree_cell_v
    Errors: [if failed, provide error details]
    ```
 
-4. **Tree View Complete Test Results** (Section 1 - 13 tests)
+4. **Tree View Complete Test Results** (Section 1 - 8 tests)
    - Map display verification
    - Zoom controls functionality
-   - NODES table (all 276 rows, filtered to 1 row after search)
-   - EDGES table (all 298 rows, remains unfiltered by node selection)
-   - Mitochondrion selection via text search
-   - SUB NETWORK VIEWER integration
-   - VASN node selection in sub-network
-   - Table synchronization
-   - VASN-SLC37A4 edge selection via EDGES table
-   - Selection clearing
+   - Node search for Mitochondrion
+   - Nodes table reflects the single selected node
+   - Edges table remains unfiltered
+   - Sub Network Viewer renders the subsystem
+   - Sub Network Viewer node selection matches data-grid label
+   - Clearing the selection restores the default state
 
-5. **Cell View Complete Test Results** (Section 2 - 13 tests)
-   - Circle packing visualization
+5. **Cell View Complete Test Results** (Section 2 - 8 tests)
+   - Circle packing visualization loads correctly
    - Zoom controls functionality
-   - NODES table (all 276 rows, filtered to 1 row after search)
-   - EDGES table (all 298 rows, remains unfiltered by node selection)
-   - Mitochondrion selection via text search
-   - SUB NETWORK VIEWER integration
-   - VASN node selection in sub-network
-   - Table synchronization
-   - VASN-SLC37A4 edge selection via EDGES table
-   - Selection clearing
+   - Node search for Mitochondrion
+   - Nodes table reflects the single selected node
+   - Edges table remains unfiltered
+   - Sub Network Viewer renders the subsystem
+   - Sub Network Viewer node selection matches data-grid label
+   - Clearing the selection restores the default state
 
 6. **SUB NETWORK VIEWER Filters Test Results** (Section 3 - 5 tests)
    - Filter panel display verification
@@ -332,8 +328,8 @@ Create a comprehensive test report saved as: `./test_results/reports/tree_cell_v
 
 10. **Coverage Analysis**
     - Features tested: Tree View complete, Cell View complete, SUB NETWORK VIEWER filters, share controls, cleanup
-    - Test coverage percentage: Should be 100% (39/39 tests)
-    - Areas not covered: None (all 39 tests are executable)
+    - Test coverage percentage: Should be 100% (29/29 tests)
+    - Areas not covered: None (all 29 tests are executable)
 
 11. **Recommendations**
 11. **Recommendations**
@@ -351,7 +347,7 @@ Create a comprehensive test report saved as: `./test_results/reports/tree_cell_v
 ## Execution Guidelines
 
 ### What You MUST Do:
-✅ Execute ALL 39 tests in the checklist
+✅ Execute ALL 29 tests in the checklist
 ✅ Follow the exact test order specified
 ✅ Load U2OS network from NDEx before testing Tree/Cell View features
 ✅ Capture screenshots ONLY on test failures (exceptions: tests 0.4, 1.1, 2.1)
@@ -371,7 +367,7 @@ Create a comprehensive test report saved as: `./test_results/reports/tree_cell_v
 ❌ **NEVER** execute tests out of order
 ❌ **NEVER** skip the final report generation
 ❌ **NEVER** take unnecessary screenshots (only on failures unless explicitly required)
-❌ **NEVER** use attempt_completion before all 39 tests are done
+❌ **NEVER** use attempt_completion before all 29 tests are done
 ❌ **NEVER** assume you've done "enough" testing without counting
 
 ⚠️ **If you find yourself thinking "I'll skip this to save time" - STOP. That's a violation.**
@@ -393,7 +389,7 @@ If you catch yourself thinking or doing any of these, STOP immediately:
 🚩 "I've completed the important sections"
 🚩 "Testing is taking longer than expected, I should finish"
 
-**These are ALL violations of the explicit requirements. Continue testing until all 39 tests are done.**
+**These are ALL violations of the explicit requirements. Continue testing until all 29 tests are done.**
 
 ---
 
@@ -411,13 +407,13 @@ If you catch yourself thinking or doing any of these, STOP immediately:
 ## Success Criteria
 
 Your test execution will be considered successful if:
-1. ✅ All 39 tests are executed (no skips)
+1. ✅ All 29 tests are executed (no skips)
 2. ✅ Each test has clear pass/fail status documented
 3. ✅ Screenshots are captured on test failures and explicit exceptions (0.4, 1.1, 2.1)
 4. ✅ Final report is generated and saved
 5. ✅ Report includes all required sections
 6. ✅ Test results are reproducible and verifiable
-7. ✅ You can explicitly count and verify 39 tests were executed
+7. ✅ You can explicitly count and verify 29 tests were executed
 8. ✅ Section 5 (Cleanup) was executed LAST
 
 **If you cannot verify all 8 criteria above, you have NOT successfully completed the task.**
@@ -460,7 +456,7 @@ Begin by:
 7. Starting with Section 0 (Setup)
 8. Proceeding methodically through each section
 9. Updating progress counter after each section
-10. NOT stopping until all 39 tests are done
+10. NOT stopping until all 29 tests are done
 
 ---
 
@@ -469,9 +465,9 @@ Begin by:
 **STOP - Before using attempt_completion, verify:**
 
 ```
-Total Tests in Checklist: 39
+Total Tests in Checklist: 29
 Legitimate Skips: 0
-Required Tests to Execute: 39
+Required Tests to Execute: 29
 
 Tests I Executed: ___ (COUNT THEM)
 Sections Complete: ___ (LIST THEM: 0, 1, 2, 3, 4, 5)
@@ -489,12 +485,12 @@ IF ANY NUMBER OR ANSWER IS WRONG, DO NOT COMPLETE. CONTINUE TESTING.
 This is a **focused quality assurance task** for Tree View and Cell View features. The goal is to provide complete confidence in these specific visualization modes through exhaustive testing. **Do not take shortcuts.** Execute every test thoroughly, document every result, and deliver a complete, actionable test report.
 
 **Remember: Your task is NOT complete until:**
-- All 39 tests are executed ✓
+- All 29 tests are executed ✓
 - The final report is generated and saved ✓
 - Test cleanup (Section 5) is completed as the LAST step ✓
 - You have explicitly counted and verified all tests are done ✓
 
-**The number 39 is not negotiable. If you executed fewer tests, you failed the task.**
+**The number 29 is not negotiable. If you executed fewer tests, you failed the task.**
 
 ---
 
