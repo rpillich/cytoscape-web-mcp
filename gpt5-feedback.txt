@@ -1,0 +1,12 @@
+The NODES/EDGES tables are rendered via the canvas-based DataGridDnd component, so there are no DOM <tr> elements to count; automated checks must interrogate internal React props (memoizedProps.rows, getCellContent) or Cytoscape data instead. 
+
+Similarly, Sub Network Viewer selections are actually Cytoscape.js objects inside #cy-container—direct row clicks only register after the canvas fires pointer events, and the toolbar actions (SELECT NODES / SELECT EDGES) are lazy-rendered and remain hidden until a grid row is actively selected. 
+
+Improving these views will likely require exposing semantic hooks (e.g., data attributes or lightweight DOM table mirrors) and promoting the selection controls so they’re consistently discoverable without synthetic event gymnastics.
+
+A few more items for the backlog:
+
+	•	Expose stable selectors/test IDs. Many high-value controls (e.g., toolbar buttons, filter toggles) only have dynamic React class names. Adding deterministic data-testid attributes would simplify automated coverage and reduce reliance on fragile text matching.
+	•	Surface toolbar controls earlier. The SELECT NODES/EDGES buttons currently appear only after the grid raises a selection event. Consider rendering them persistently (disabled until a row is selected) so users aren’t hunting for disappearing UI and scripts don’t need extra guards.
+	•	Provide DOM mirrors for grid data. Even a lightweight <table> (hidden or aria-only) reflecting the canvas content would give both a11y technology and tests a way to count rows or read labels without dipping into React internals.
+	•	Add API endpoints or MCP helpers. A small MCP endpoint that returns the current selection state (nodes/edges) or table row counts via the app’s own model would eliminate the need to inject long evaluate_script snippets and lower the risk of breaking automation when internal structures change.
