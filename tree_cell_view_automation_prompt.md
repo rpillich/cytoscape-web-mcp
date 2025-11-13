@@ -238,8 +238,8 @@ Cell View Complete (Section 2 - 8 tests):
 
 Sub Network Viewer selection workflow (applies to automated Tests 1.7 and 2.9):
 - After switching to the Sub Network Viewer tab, press the mini-network `fit` button so the canvas has focus.
-- Trigger the scripted click on the first NODES row (leftmost cell) to highlight it.
-- Use the `SELECT NODES` button beneath the NODES tab header to push the selection into the mini network.
+- Trigger the scripted click on the first NODES row (leftmost cell) to highlight it. **Important:** the toolbar controls (`APPLY VALUE TO SELECTED NODES`, `SELECT NODES`, and the `SELECT EDGES` variant) only appear after a data-grid row is actively selected, so do not expect to see them beforehand.
+- Once the row is highlighted, use the `SELECT NODES` button beneath the NODES tab header to push the selection into the mini network. (With the EDGES tab active the control label becomes `SELECT EDGES`, but the workflow is identical.)
 - Verify via script that the grid row label matches the selected node label in the mini network rendering.
 
 ### E. Reporting Requirements

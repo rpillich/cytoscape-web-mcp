@@ -397,6 +397,10 @@
               "action": "take_snapshot"
             },
             {
+              "action": "note",
+              "text": "Once the row is highlighted, the toolbar reveals APPLY VALUE/SELECT NODES controls; do not proceed until the `SELECT NODES` button is visible."
+            },
+            {
               "action": "click",
               "target": "button 'SELECT NODES'"
             },
@@ -652,6 +656,10 @@
             },
             {
               "action": "take_snapshot"
+            },
+            {
+              "action": "note",
+              "text": "After the row is selected the toolbar renders the `SELECT NODES` button (or `SELECT EDGES` when applicable); continue only once the button is visible."
             },
             {
               "action": "click",
